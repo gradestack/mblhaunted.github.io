@@ -161,6 +161,24 @@
             border-bottom-color: #2563eb;
         }
 
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin: 30px 0;
+            border: 1px solid rgba(30, 64, 175, 0.1);
+        }
+
+        .image-caption {
+            text-align: center;
+            font-size: 0.9em;
+            color: #64748b;
+            margin-top: -20px;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
         .wave-accent {
             width: 60px;
             height: 4px;
@@ -208,9 +226,17 @@ Wave 4: [integration-tests]                       ← final one</code></pre>
 
         <p>If not? Makes a new plan and tries again. Keeps going until it works or you stop it.</p>
 
-        <p>There's this "Reaper" thing too. If a task hangs or stops producing output, it kills it but saves what went wrong. Next time that task runs, the agent can see what failed before. "Attempt #1: Got stuck on token validation. Attempt #2: JWT library dependency issues." So it won't make the same mistake twice.</p>
+        <h2>The Reaper</h2>
 
-        <p>It'll even catch when you're in a loop. Same task dies 3 times? Or you're on try #5 and barely anything's done? It forces the team to try something totally different instead of banging their head against the same wall.</p>
+        <p>This is honestly one of the cooler parts. There's a monitoring system called the Reaper that watches all running tasks. If something hangs or goes silent for too long, it kills the task. But here's the thing - it doesn't just kill it and forget about it.</p>
+
+        <p>It saves the "corpse." What the task was doing, how long it ran, what it was stuck on, any partial work it did. Everything.</p>
+
+        <p>When that task gets retried (and it will), the new agent sees all of this. "Attempt #1: Killed after 195s, was silent for 180s, got stuck on token validation. Attempt #2: Killed after 215s, tried JWT library but hit dependency issues."</p>
+
+        <p>So the new agent knows exactly what not to do. Won't try the same approach twice. Actually learns from failures.</p>
+
+        <p>It also catches thrashing. Same task dies 3 times? Or you're on iteration 5 and barely anything's done? The system detects this and forces the planning team to try something completely different. No more banging your head against the same wall.</p>
 
         <h2>When You'd Use This</h2>
 
@@ -229,6 +255,9 @@ Wave 4: [integration-tests]                       ← final one</code></pre>
 
         <p>That's it. Plans it, runs it in parallel waves, cleans up after itself, checks if it worked, retries if needed.</p>
 
+        <img src="waverunner1.png" alt="Simple waverunner demo prompt">
+        <p class="image-caption">Just give it a goal and let it run</p>
+
         <h2>The Persona Thing Actually Matters</h2>
 
         <p>So those personas aren't just for show. Each one has a real job and they actually catch different problems.</p>
@@ -244,6 +273,9 @@ Wave 4: [integration-tests]                       ← final one</code></pre>
         <p>There's also a Kanban mode with different personas (Flow Master, Kaizen Voice, Quality Gate) based on Toyota Production System stuff. Better for maintenance work than feature development.</p>
 
         <p>Point is, they're not roleplay. Each one catches different failure modes before you hit them.</p>
+
+        <img src="waverunner2.png" alt="Team planning session output">
+        <p class="image-caption">The planning team breaking down a task (spoiler: they eventually completed it successfully)</p>
 
         <h2>Swappable Models and MCP</h2>
 
@@ -280,10 +312,6 @@ pip install -e .</code></pre>
         <p>Just the parallel execution saves so much time. And the retry stuff means you don't get stuck with half-done work when something breaks.</p>
 
         <p>That's waverunner. If you use Claude Code for more than quick one-off stuff, try it out.</p>
-
-        <hr>
-
-        <p><strong>Source:</strong> <a href="https://github.com/yourusername/waverunner">github.com/yourusername/waverunner</a></p>
     </div>
 </body>
 </html>

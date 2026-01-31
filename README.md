@@ -29,9 +29,17 @@ After everything runs, it does a cleanup pass. Removes your debug prints, test f
 
 If not? Makes a new plan and tries again. Keeps going until it works or you stop it.
 
-There's this "Reaper" thing too. If a task hangs or stops producing output, it kills it but saves what went wrong. Next time that task runs, the agent can see what failed before. "Attempt #1: Got stuck on token validation. Attempt #2: JWT library dependency issues." So it won't make the same mistake twice.
+## The Reaper
 
-It'll even catch when you're in a loop. Same task dies 3 times? Or you're on try #5 and barely anything's done? It forces the team to try something totally different instead of banging their head against the same wall.
+This is honestly one of the cooler parts. There's a monitoring system called the Reaper that watches all running tasks. If something hangs or goes silent for too long, it kills the task. But here's the thing - it doesn't just kill it and forget about it.
+
+It saves the "corpse." What the task was doing, how long it ran, what it was stuck on, any partial work it did. Everything.
+
+When that task gets retried (and it will), the new agent sees all of this. "Attempt #1: Killed after 195s, was silent for 180s, got stuck on token validation. Attempt #2: Killed after 215s, tried JWT library but hit dependency issues."
+
+So the new agent knows exactly what not to do. Won't try the same approach twice. Actually learns from failures.
+
+It also catches thrashing. Same task dies 3 times? Or you're on iteration 5 and barely anything's done? The system detects this and forces the planning team to try something completely different. No more banging your head against the same wall.
 
 ## When You'd Use This
 
@@ -105,7 +113,3 @@ Yeah it does. I mean it's not gonna fix an impossible task or a completely broke
 Just the parallel execution saves so much time. And the retry stuff means you don't get stuck with half-done work when something breaks.
 
 That's waverunner. If you use Claude Code for more than quick one-off stuff, try it out.
-
----
-
-**Source:** [github.com/yourusername/waverunner](https://github.com)
