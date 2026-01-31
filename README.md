@@ -1,100 +1,100 @@
-# You Probably Shouldn't Use This But I'm Running It In Production
+# you probably shouldn't use this but i'm running it in production
 
-So Claude Code is great at single tasks. Need a function? Done. Bug fix? Easy. But the second you ask it to do something bigger like "build user authentication" or "add an API layer", it just... doesn't work well. You end up either babysitting it through every little step or it tries to do everything one at a time and takes forever.
+so claude code is great at single tasks. need a function? done. bug fix? easy. but the second you ask it to do something bigger like "build user authentication" or "add an api layer", it just... doesn't work well. you end up either babysitting it through every little step or it tries to do everything one at a time and takes forever.
 
-Got annoying pretty fast. So I made **waverunner**.
+got annoying pretty fast. so i made **waverunner**.
 
-## What It Does
+## what it does
 
-You give it a goal like "Add JWT authentication to my app." Instead of Claude just going for it, waverunner does this whole planning thing with different personas. There's a Tech Lead, Senior Dev, Explorer, Skeptic, and a Maverick who basically argues with everyone.
+you give it a goal like "add jwt authentication to my app." instead of claude just going for it, waverunner does this whole planning thing with different personas. there's a tech lead, senior dev, explorer, skeptic, and a maverick who basically argues with everyone.
 
-They argue it out. Explorer's like "we don't know what auth is already there." Skeptic goes "yeah what if there's existing code?" Maverick challenges their time estimates. Eventually they figure out a plan with all the tasks and what depends on what.
+they argue it out. explorer's like "we don't know what auth is already there." skeptic goes "yeah what if there's existing code?" maverick challenges their time estimates. eventually they figure out a plan with all the tasks and what depends on what.
 
-Then the good part: **it runs everything that can run at the same time, at the same time.**
+then the good part: **it runs everything that can run at the same time, at the same time.**
 
-Like if you need database setup, auth system, and logging, those don't need each other. So waverunner just starts all three. When they finish, it moves to the next batch of tasks. Everything that can be parallel, is parallel.
+like if you need database setup, auth system, and logging, those don't need each other. so waverunner just starts all three. when they finish, it moves to the next batch of tasks. everything that can be parallel, is parallel.
 
 ```
-Wave 1: [setup-db] [setup-auth] [setup-logging]  ← all at once
-Wave 2: [implement-users]                         ← waits for auth + db
-Wave 3: [implement-api] [implement-tests]         ← both at once
-Wave 4: [integration-tests]                       ← final one
+wave 1: [setup-db] [setup-auth] [setup-logging]  ← all at once
+wave 2: [implement-users]                         ← waits for auth + db
+wave 3: [implement-api] [implement-tests]         ← both at once
+wave 4: [integration-tests]                       ← final one
 ```
 
-There's a live dashboard with progress bars for each task, cost tracking, tokens per second. It's honestly fun to watch.
+there's a live dashboard with progress bars for each task, cost tracking, tokens per second. it's honestly fun to watch.
 
-## The Self-Healing Part
+## the self-healing part
 
-After everything runs, it does a cleanup pass. Removes your debug prints, test files, unused imports, all that stuff you'd have to clean up yourself. Then Claude looks at what got done and decides if the original goal was met.
+after everything runs, it does a cleanup pass. removes your debug prints, test files, unused imports, all that stuff you'd have to clean up yourself. then claude looks at what got done and decides if the original goal was met.
 
-If not? Makes a new plan and tries again. Keeps going until it works or you stop it.
+if not? makes a new plan and tries again. keeps going until it works or you stop it.
 
-## The Reaper
+## the reaper
 
-This is honestly one of the cooler parts. There's a monitoring system called the Reaper that watches all running tasks. If something hangs or goes silent for too long, it kills the task. But here's the thing - it doesn't just kill it and forget about it.
+this is honestly one of the cooler parts. there's a monitoring system called the reaper that watches all running tasks. if something hangs or goes silent for too long, it kills the task. but here's the thing - it doesn't just kill it and forget about it.
 
-It saves the "corpse." What the task was doing, how long it ran, what it was stuck on, any partial work it did. Everything.
+it saves the "corpse." what the task was doing, how long it ran, what it was stuck on, any partial work it did. everything.
 
-When that task gets retried (and it will), the new agent sees all of this. "Attempt #1: Killed after 195s, was silent for 180s, got stuck on token validation. Attempt #2: Killed after 215s, tried JWT library but hit dependency issues."
+when that task gets retried (and it will), the new agent sees all of this. "attempt #1: killed after 195s, was silent for 180s, got stuck on token validation. attempt #2: killed after 215s, tried jwt library but hit dependency issues."
 
-So the new agent knows exactly what not to do. Won't try the same approach twice. Actually learns from failures.
+so the new agent knows exactly what not to do. won't try the same approach twice. actually learns from failures.
 
-It also catches thrashing. Same task dies 3 times? Or you're on iteration 5 and barely anything's done? The system detects this and forces the planning team to try something completely different. No more banging your head against the same wall.
+it also catches thrashing. same task dies 3 times? or you're on iteration 5 and barely anything's done? the system detects this and forces the planning team to try something completely different. no more banging your head against the same wall.
 
-## When You'd Use This
+## when you'd use this
 
-Basically anytime you'd normally break something down for Claude yourself.
+basically anytime you'd normally break something down for claude yourself.
 
-- "Add user authentication"
-- "Build a REST API for this data model"
-- "Refactor this auth system"
-- "Fix these bug reports"
+- "add user authentication"
+- "build a rest api for this data model"
+- "refactor this auth system"
+- "fix these bug reports"
 
-Instead of walking Claude through it piece by piece:
+instead of walking claude through it piece by piece:
 
 ```bash
-waverunner go "Add user authentication with JWT"
+waverunner go "add user authentication with jwt"
 ```
 
-That's it. Plans it, runs it in parallel waves, cleans up after itself, checks if it worked, retries if needed.
+that's it. plans it, runs it in parallel waves, cleans up after itself, checks if it worked, retries if needed.
 
-## The Persona Thing Actually Matters
+## the persona thing actually matters
 
-So those personas aren't just for show. Each one has a real job and they actually catch different problems.
+so those personas aren't just for show. each one has a real job and they actually catch different problems.
 
-The **Explorer** is there to flag unknowns before you waste time implementing the wrong thing. "Do we even know what the current auth looks like?" That kind of stuff.
+the **explorer** is there to flag unknowns before you waste time implementing the wrong thing. "do we even know what the current auth looks like?" that kind of stuff.
 
-**Skeptic** questions assumptions. "What if there's already auth middleware we should use instead of writing new code?" Saves you from reinventing wheels.
+**skeptic** questions assumptions. "what if there's already auth middleware we should use instead of writing new code?" saves you from reinventing wheels.
 
-**Maverick** is honestly the most useful one. Challenges everything. "You estimated this as small but how do you know? What if the integration is way more complex?" Forces the team to think harder about their plan.
+**maverick** is honestly the most useful one. challenges everything. "you estimated this as small but how do you know? what if the integration is way more complex?" forces the team to think harder about their plan.
 
-**Tech Lead** keeps it moving and breaks stuff down. **Senior Dev** actually estimates complexity and pushes for simple solutions.
+**tech lead** keeps it moving and breaks stuff down. **senior dev** actually estimates complexity and pushes for simple solutions.
 
-There's also a Kanban mode with different personas (Flow Master, Kaizen Voice, Quality Gate) based on Toyota Production System stuff. Better for maintenance work than feature development.
+there's also a kanban mode with different personas (flow master, kaizen voice, quality gate) based on toyota production system stuff. better for maintenance work than feature development.
 
-Point is, they're not roleplay. Each one catches different failure modes before you hit them.
+point is, they're not roleplay. each one catches different failure modes before you hit them.
 
-## Swappable Models and MCP
+## swappable models and mcp
 
-You can use different LLM providers. There's a provider abstraction so you're not locked into just Claude. Extend the `LLMProvider` class and you can plug in whatever model you want.
+you can use different llm providers. there's a provider abstraction so you're not locked into just claude. extend the `llmprovider` class and you can plug in whatever model you want.
 
-MCP integration is solid too. Pass `--mcp` with a config file and every agent gets access to those tools. Need to query a database? Connect to an API? Read from some external service? Just inject the MCP server and all your agents can use it.
+mcp integration is solid too. pass `--mcp` with a config file and every agent gets access to those tools. need to query a database? connect to an api? read from some external service? just inject the mcp server and all your agents can use it.
 
 ```bash
-waverunner go "Analyze this week's user signups" --mcp ~/database-mcp.json
+waverunner go "analyze this week's user signups" --mcp ~/database-mcp.json
 ```
 
-The MCP config gets passed to every Claude instance that spins up. So your Explorer can investigate the database, your implementation tasks can query it, whatever. It just works.
+the mcp config gets passed to every claude instance that spins up. so your explorer can investigate the database, your implementation tasks can query it, whatever. it just works.
 
-## Spike Tasks
+## spike tasks
 
-This is a cool feature. If the team doesn't know something, they make "spike" tasks. Basically just investigation work. The spike runs first, figures things out, and the findings get passed to whatever tasks need them. So you're not building blind.
+this is a cool feature. if the team doesn't know something, they make "spike" tasks. basically just investigation work. the spike runs first, figures things out, and the findings get passed to whatever tasks need them. so you're not building blind.
 
-Spikes run in their own workspace so you don't end up with test junk all over your actual project.
+spikes run in their own workspace so you don't end up with test junk all over your actual project.
 
-## Setup
+## setup
 
-Nothing special:
+nothing special:
 
 ```bash
 git clone <your-repo-url>
@@ -104,12 +104,12 @@ source .venv/bin/activate
 pip install -e .
 ```
 
-Need Python 3.10+ and Claude Code CLI installed.
+need python 3.10+ and claude code cli installed.
 
-## Does It Work?
+## does it work?
 
-Yeah it does. I mean it's not gonna fix an impossible task or a completely broken codebase. But for stuff that's too big for one prompt and too annoying to micromanage? Big difference.
+yeah it does. i mean it's not gonna fix an impossible task or a completely broken codebase. but for stuff that's too big for one prompt and too annoying to micromanage? big difference.
 
-Just the parallel execution saves so much time. And the retry stuff means you don't get stuck with half-done work when something breaks.
+just the parallel execution saves so much time. and the retry stuff means you don't get stuck with half-done work when something breaks.
 
-That's waverunner. If you use Claude Code for more than quick one-off stuff, try it out.
+that's waverunner. if you use claude code for more than quick one-off stuff, try it out.
