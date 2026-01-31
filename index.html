@@ -168,6 +168,13 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             margin: 30px 0;
             border: 1px solid rgba(30, 64, 175, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);
         }
 
         .image-caption {
@@ -255,7 +262,7 @@ wave 4: [integration-tests]                       ← final one</code></pre>
 
         <p>that's it. plans it, runs it in parallel waves, cleans up after itself, checks if it worked, retries if needed.</p>
 
-        <img src="waverunner1.png" alt="simple waverunner demo prompt">
+        <a href="waverunner1.png" target="_blank"><img src="waverunner1.png" alt="simple waverunner demo prompt"></a>
         <p class="image-caption">just give it a goal and let it run</p>
 
         <h2>the persona thing actually matters</h2>
@@ -274,7 +281,7 @@ wave 4: [integration-tests]                       ← final one</code></pre>
 
         <p>point is, they're not roleplay. each one catches different failure modes before you hit them.</p>
 
-        <img src="waverunner2.png" alt="team planning session output">
+        <a href="waverunner2.png" target="_blank"><img src="waverunner2.png" alt="team planning session output"></a>
         <p class="image-caption">the planning team breaking down a task (spoiler: they eventually completed it successfully)</p>
 
         <h2>swappable models and mcp</h2>
