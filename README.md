@@ -1,4 +1,4 @@
-# I Built a Thing That Makes Claude Code Actually Work on Big Tasks
+# You Probably Shouldn't Use This But I'm Running It In Production
 
 So Claude Code is great at single tasks. Need a function? Done. Bug fix? Easy. But the second you ask it to do something bigger like "build user authentication" or "add an API layer", it just... doesn't work well. You end up either babysitting it through every little step or it tries to do everything one at a time and takes forever.
 
