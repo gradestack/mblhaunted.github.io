@@ -229,7 +229,31 @@ Wave 4: [integration-tests]                       ← final one</code></pre>
 
         <p>That's it. Plans it, runs it in parallel waves, cleans up after itself, checks if it worked, retries if needed.</p>
 
-        <p>There's also MCP server support if you need database access or whatever. Kanban mode for maintenance work. Bunch of flags for timeouts and confirmation and stuff.</p>
+        <h2>The Persona Thing Actually Matters</h2>
+
+        <p>So those personas aren't just for show. Each one has a real job and they actually catch different problems.</p>
+
+        <p>The <strong>Explorer</strong> is there to flag unknowns before you waste time implementing the wrong thing. "Do we even know what the current auth looks like?" That kind of stuff.</p>
+
+        <p><strong>Skeptic</strong> questions assumptions. "What if there's already auth middleware we should use instead of writing new code?" Saves you from reinventing wheels.</p>
+
+        <p><strong>Maverick</strong> is honestly the most useful one. Challenges everything. "You estimated this as small but how do you know? What if the integration is way more complex?" Forces the team to think harder about their plan.</p>
+
+        <p><strong>Tech Lead</strong> keeps it moving and breaks stuff down. <strong>Senior Dev</strong> actually estimates complexity and pushes for simple solutions.</p>
+
+        <p>There's also a Kanban mode with different personas (Flow Master, Kaizen Voice, Quality Gate) based on Toyota Production System stuff. Better for maintenance work than feature development.</p>
+
+        <p>Point is, they're not roleplay. Each one catches different failure modes before you hit them.</p>
+
+        <h2>Swappable Models and MCP</h2>
+
+        <p>You can use different LLM providers. There's a provider abstraction so you're not locked into just Claude. Extend the <code>LLMProvider</code> class and you can plug in whatever model you want.</p>
+
+        <p>MCP integration is solid too. Pass <code>--mcp</code> with a config file and every agent gets access to those tools. Need to query a database? Connect to an API? Read from some external service? Just inject the MCP server and all your agents can use it.</p>
+
+        <pre><code>waverunner go "Analyze this week's user signups" --mcp ~/database-mcp.json</code></pre>
+
+        <p>The MCP config gets passed to every Claude instance that spins up. So your Explorer can investigate the database, your implementation tasks can query it, whatever. It just works.</p>
 
         <h2>Spike Tasks</h2>
 

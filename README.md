@@ -50,7 +50,33 @@ waverunner go "Add user authentication with JWT"
 
 That's it. Plans it, runs it in parallel waves, cleans up after itself, checks if it worked, retries if needed.
 
-There's also MCP server support if you need database access or whatever. Kanban mode for maintenance work. Bunch of flags for timeouts and confirmation and stuff.
+## The Persona Thing Actually Matters
+
+So those personas aren't just for show. Each one has a real job and they actually catch different problems.
+
+The **Explorer** is there to flag unknowns before you waste time implementing the wrong thing. "Do we even know what the current auth looks like?" That kind of stuff.
+
+**Skeptic** questions assumptions. "What if there's already auth middleware we should use instead of writing new code?" Saves you from reinventing wheels.
+
+**Maverick** is honestly the most useful one. Challenges everything. "You estimated this as small but how do you know? What if the integration is way more complex?" Forces the team to think harder about their plan.
+
+**Tech Lead** keeps it moving and breaks stuff down. **Senior Dev** actually estimates complexity and pushes for simple solutions.
+
+There's also a Kanban mode with different personas (Flow Master, Kaizen Voice, Quality Gate) based on Toyota Production System stuff. Better for maintenance work than feature development.
+
+Point is, they're not roleplay. Each one catches different failure modes before you hit them.
+
+## Swappable Models and MCP
+
+You can use different LLM providers. There's a provider abstraction so you're not locked into just Claude. Extend the `LLMProvider` class and you can plug in whatever model you want.
+
+MCP integration is solid too. Pass `--mcp` with a config file and every agent gets access to those tools. Need to query a database? Connect to an API? Read from some external service? Just inject the MCP server and all your agents can use it.
+
+```bash
+waverunner go "Analyze this week's user signups" --mcp ~/database-mcp.json
+```
+
+The MCP config gets passed to every Claude instance that spins up. So your Explorer can investigate the database, your implementation tasks can query it, whatever. It just works.
 
 ## Spike Tasks
 
