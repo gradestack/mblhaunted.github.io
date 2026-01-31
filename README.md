@@ -1,66 +1,66 @@
 # I Built a Thing That Makes Claude Code Actually Work on Big Tasks
 
-So here's the problem: Claude Code is really good at single tasks. Need a function written? Done. Bug fix? Easy. But try something bigger, like "build user authentication" or "add an entire API layer", and you hit this wall. You're either manually breaking everything down into tiny pieces or watching Claude try to do everything one at a time.
+So Claude Code is great at single tasks. Need a function? Done. Bug fix? Easy. But the second you ask it to do something bigger like "build user authentication" or "add an API layer", it just... doesn't work well. You end up either babysitting it through every little step or it tries to do everything one at a time and takes forever.
 
-I got tired of it. So I built **waverunner**.
+Got annoying pretty fast. So I made **waverunner**.
 
-## What It Actually Does
+## What It Does
 
-You give waverunner a goal. Something like "Add JWT authentication to my app." Instead of Claude just diving in, waverunner spins up a planning session with different personas. Tech Lead, Senior Dev, Explorer, Skeptic, and this Maverick character who questions everything.
+You give it a goal like "Add JWT authentication to my app." Instead of Claude just going for it, waverunner does this whole planning thing with different personas. There's a Tech Lead, Senior Dev, Explorer, Skeptic, and a Maverick who basically argues with everyone.
 
-They hash it out. The Explorer points out what's unknown. The Skeptic asks "wait, do we already have auth code we should reuse?" The Maverick challenges estimates. Eventually they come up with a plan with tasks and dependencies.
+They argue it out. Explorer's like "we don't know what auth is already there." Skeptic goes "yeah what if there's existing code?" Maverick challenges their time estimates. Eventually they figure out a plan with all the tasks and what depends on what.
 
-Then here's the cool part: **it runs everything in parallel that can run in parallel.**
+Then the good part: **it runs everything that can run at the same time, at the same time.**
 
-Say you need to set up a database, auth system, and logging. Those don't depend on each other, so waverunner fires them all off at once. Once they're done, it moves to the next "wave" of tasks. Stuff that can run together, runs together.
+Like if you need database setup, auth system, and logging, those don't need each other. So waverunner just starts all three. When they finish, it moves to the next batch of tasks. Everything that can be parallel, is parallel.
 
 ```
 Wave 1: [setup-db] [setup-auth] [setup-logging]  ← all at once
 Wave 2: [implement-users]                         ← waits for auth + db
-Wave 3: [implement-api] [implement-tests]         ← both run together
-Wave 4: [integration-tests]                       ← final wave
+Wave 3: [implement-api] [implement-tests]         ← both at once
+Wave 4: [integration-tests]                       ← final one
 ```
 
-You get this live dashboard showing progress bars for every running task, cost estimates, tokens per second, the whole deal. It's pretty satisfying to watch.
+There's a live dashboard with progress bars for each task, cost tracking, tokens per second. It's honestly fun to watch.
 
-## The Self-Healing Stuff
+## The Self-Healing Part
 
-After all tasks run, there's a cleanup pass that removes debug prints, test files, unused imports. All the junk you'd normally have to sweep up manually. Then Claude evaluates whether the original goal was actually met.
+After everything runs, it does a cleanup pass. Removes your debug prints, test files, unused imports, all that stuff you'd have to clean up yourself. Then Claude looks at what got done and decides if the original goal was met.
 
-If not? It generates a follow-up sprint and tries again. And again. Until it works or you kill it.
+If not? Makes a new plan and tries again. Keeps going until it works or you stop it.
 
-There's also this "Reaper" system that monitors tasks. If something hangs or goes silent for too long, it kills the task but saves what went wrong. When the task gets retried, the new agent sees the corpse of the previous attempt. "Attempt #1: Got stuck on token validation. Attempt #2: JWT library had dependency issues." So it doesn't repeat the same mistakes.
+There's this "Reaper" thing too. If a task hangs or stops producing output, it kills it but saves what went wrong. Next time that task runs, the agent can see what failed before. "Attempt #1: Got stuck on token validation. Attempt #2: JWT library dependency issues." So it won't make the same mistake twice.
 
-It even detects when you're stuck in a loop. Like if the same task gets killed three times, or you're on iteration 5 with barely any progress. When that happens, it forces the planning team to try something completely different.
+It'll even catch when you're in a loop. Same task dies 3 times? Or you're on try #5 and barely anything's done? It forces the team to try something totally different instead of banging their head against the same wall.
 
-## When You'd Actually Use This
+## When You'd Use This
 
-Any time you're about to break something down manually for Claude.
+Basically anytime you'd normally break something down for Claude yourself.
 
 - "Add user authentication"
 - "Build a REST API for this data model"
 - "Refactor this auth system"
-- "Fix these five bug reports"
+- "Fix these bug reports"
 
-Instead of feeding Claude one piece at a time, you just:
+Instead of walking Claude through it piece by piece:
 
 ```bash
 waverunner go "Add user authentication with JWT"
 ```
 
-And it handles the rest. The team plans it, breaks it into waves, executes in parallel, cleans up, evaluates, and retries if needed.
+That's it. Plans it, runs it in parallel waves, cleans up after itself, checks if it worked, retries if needed.
 
-You can also inject MCP servers if you need database access or external APIs. There's a Kanban mode if you're doing maintenance work instead of feature development. You can set confirmation flags, timeouts, context. There's a bunch of knobs if you need them.
+There's also MCP server support if you need database access or whatever. Kanban mode for maintenance work. Bunch of flags for timeouts and confirmation and stuff.
 
-## The Spike Thing
+## Spike Tasks
 
-One feature I really like: if the planning team encounters something unknown, they create "spike" tasks. Investigation missions basically. A spike runs first, figures out what's going on, and its findings automatically flow to dependent tasks. So you're not implementing blind.
+This is a cool feature. If the team doesn't know something, they make "spike" tasks. Basically just investigation work. The spike runs first, figures things out, and the findings get passed to whatever tasks need them. So you're not building blind.
 
-Spikes run in an isolated workspace so you don't clutter your project with random test files.
+Spikes run in their own workspace so you don't end up with test junk all over your actual project.
 
-## Installation
+## Setup
 
-Pretty standard:
+Nothing special:
 
 ```bash
 git clone <your-repo-url>
@@ -70,15 +70,15 @@ source .venv/bin/activate
 pip install -e .
 ```
 
-You need Python 3.10+ and the Claude Code CLI already installed.
+Need Python 3.10+ and Claude Code CLI installed.
 
-## Does It Actually Work?
+## Does It Work?
 
-Yeah. I mean, it's not magic. If your goal is impossible or your codebase is a disaster, waverunner can't fix that. But for mid-sized tasks that are too big for a single prompt and too tedious to micromanage? It's night and day.
+Yeah it does. I mean it's not gonna fix an impossible task or a completely broken codebase. But for stuff that's too big for one prompt and too annoying to micromanage? Big difference.
 
-The parallel execution alone saves a ton of time. And the retry logic means you're not left with half-finished work when something goes wrong.
+Just the parallel execution saves so much time. And the retry stuff means you don't get stuck with half-done work when something breaks.
 
-Anyway, that's waverunner. If you're using Claude Code for anything beyond one-off functions, give it a shot.
+That's waverunner. If you use Claude Code for more than quick one-off stuff, try it out.
 
 ---
 
